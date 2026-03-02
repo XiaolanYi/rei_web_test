@@ -32,5 +32,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ steps.strings.outputs.owner_lc }}/${{ steps.strings.outputs.repo_lc }}:latest
+            ghcr.io/${{ steps.strings.outputs.owner_lc }}/${{ steps.strings.outputs.repo_lc }}:1.0
             ghcr.io/${{ steps.strings.outputs.owner_lc }}/${{ steps.strings.outputs.repo_lc }}:${{ github.sha }}
