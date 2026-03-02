@@ -1,43 +1,36 @@
-name: Build and Push Docker Image
+name: Docker Build & Push
 
 on:
   push:
-    branches: [ main ]          # or your default branch
-    tags: [ 'v*.*.*' ]          # optional: also build on git tags like v1.0.0
-  pull_request:
     branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     permissions:
-      contents: read
-      packages: write           # required for ghcr.io push
+      packages: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}   # automatic, no setup needed
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Set lowercase names
+        id: strings
+        run: |
+          echo "owner_lc=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+          echo "repo_lc=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .                  # folder with Dockerfile (root = .)
-          file: ./Dockerfile          # path to your Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}   # only push on push/tag, not PR
+          context: .
+          push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.sha }}
-          # Optional: add more tags like :v1.2.3 when you create git tag
-          # tags: |
-          #   ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ github.ref_name }}
+            ghcr.io/${{ steps.strings.outputs.owner_lc }}/${{ steps.strings.outputs.repo_lc }}:latest
+            ghcr.io/${{ steps.strings.outputs.owner_lc }}/${{ steps.strings.outputs.repo_lc }}:${{ github.sha }}
