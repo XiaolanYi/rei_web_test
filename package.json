@@ -1,0 +1,14 @@
+{
+  "name": "my-node-app",
+  "version": "1.0.0",
+  "description": "Node.js application for drilling frontend / backend",
+  "main": "./bin/WWW",
+  "scripts": {
+    "start": "node ./bin/WWW"
+  },
+  "author": "Your Name",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}
